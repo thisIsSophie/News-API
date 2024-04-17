@@ -13,9 +13,9 @@ describe("/api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then((response) => {
-        expect(Array.isArray(response.body)).toBe(true);
-        expect(response.body.length).toBe(3);
-        response.body.forEach((topic) => {
+        expect(Array.isArray(response.body.topics)).toBe(true);
+        expect(response.body.topics.length).toBe(3);
+        response.body.topics.forEach((topic) => {
           expect(typeof topic.slug).toBe("string");
           expect(typeof topic.description).toBe("string");
         });
