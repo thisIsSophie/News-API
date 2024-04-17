@@ -14,13 +14,28 @@ describe("/api", () => {
         });
       });
   });
-  test("GET: 200 sends an object of endpoint /topics/api", () => {
+  test("GET: 200 sends an object of endpoint /api/topics", () => {
     return request(app)
       .get("/api")
       .expect(200)
       .then((response) => {
         expect(response.body).toMatchObject({
           "GET /api/topics": expect.objectContaining({
+            description: expect.any(String),
+            queries: [],
+            exampleResponse: expect.any(Object),
+          }),
+        });
+      });
+  });
+
+  test("GET: 200 sends an object of endpoint /api/articles", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          "GET /api/articles": expect.objectContaining({
             description: expect.any(String),
             queries: [],
             exampleResponse: expect.any(Object),

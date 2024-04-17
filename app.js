@@ -2,10 +2,13 @@ const express = require("express");
 const app = express();
 const { getTopics } = require("./controllers/topics-controllers");
 const { getEndpoints } = require("./controllers/endpoints-controllers");
+const { getArticles } = require("./controllers/articles.controllers");
 
 app.get("/api/topics", getTopics);
 
 app.get("/api", getEndpoints);
+
+app.get("/api/articles", getArticles);
 
 app.use((err, req, res, next) => {
   console.log(err);
