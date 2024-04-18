@@ -5,6 +5,7 @@ const { getEndpoints } = require("./controllers/endpoints-controllers");
 const {
   getArticles,
   getArticleById,
+  getArticleComments,
 } = require("./controllers/articles.controllers");
 
 app.get("/api/topics", getTopics);
@@ -14,6 +15,8 @@ app.get("/api", getEndpoints);
 app.get("/api/articles/:article_id", getArticleById);
 
 app.get("/api/articles", getArticles);
+
+app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.use((err, req, res, next) => {
   console.log(err);
