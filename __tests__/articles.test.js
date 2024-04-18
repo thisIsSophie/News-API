@@ -4,7 +4,7 @@ const request = require("supertest");
 const app = require("../app");
 const db = require("../db/connection");
 
-beforeEach(() => seed(testData));
+beforeAll(() => seed(testData));
 afterAll(() => db.end());
 
 describe("/api/articles", () => {
@@ -54,19 +54,19 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then((response) => {
-        expect(response.body.articles[0].title).toBe(
+        expect(response.body.article.title).toBe(
           "Living in the shadow of a great man"
         );
-        expect(response.body.articles[0].topic).toBe("mitch");
-        expect(response.body.articles[0].author).toBe("butter_bridge");
-        expect(response.body.articles[0].body).toBe(
+        expect(response.body.article.topic).toBe("mitch");
+        expect(response.body.article.author).toBe("butter_bridge");
+        expect(response.body.article.body).toBe(
           "I find this existence challenging"
         );
-        expect(response.body.articles[0].created_at).toBe(
+        expect(response.body.article.created_at).toBe(
           "2020-07-09T20:11:00.000Z"
         );
-        expect(response.body.articles[0].votes).toBe(100);
-        expect(response.body.articles[0].article_img_url).toEqual(
+        expect(response.body.article.votes).toBe(100);
+        expect(response.body.article.article_img_url).toEqual(
           "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         );
       });
@@ -82,5 +82,36 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/potato")
       .expect(400)
       .expect({ msg: "ID must be an integer" });
+  });
+});
+
+describe("/api/articles/:article_id/comments", () => {
+  test("GET:200 sends all comments by Article ID to the client", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.comments.length).toBe(11);
+        response.body.comments.forEach((comment) => {
+          expect(typeof comment.article_id).toBe("number");
+          expect(typeof comment.comment_id).toBe("number");
+          expect(typeof comment.author).toBe("string");
+          expect(typeof comment.body).toBe("string");
+          expect(typeof comment.votes).toBe("number");
+        });
+      });
+  });
+  test("GET: 404 returns not found if article does not exist", () => {
+    return request(app)
+      .get("/api/articles/9999/comments")
+      .expect(404)
+      .expect({ msg: "Unable to find Article by ID - 9999" });
+  });
+
+  test("Get 200: If no comments, returns an empty array", () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(200)
+      .expect({ comments: [] });
   });
 });
