@@ -43,4 +43,18 @@ describe("/api", () => {
         });
       });
   });
+  test("GET: 200 sends an object of endpoint /api/articles/:article_id", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          "GET /api/articles/:article_id": expect.objectContaining({
+            description: expect.any(String),
+            queries: [],
+            exampleResponse: expect.any(Object),
+          }),
+        });
+      });
+  });
 });
