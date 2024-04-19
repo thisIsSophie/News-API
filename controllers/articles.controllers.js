@@ -3,6 +3,7 @@ const {
   selectArticleById,
   selectArticleComments,
   insertComment,
+  updateArticleVotes,
 } = require("../models/articles-models");
 
 exports.getArticles = (req, res, next) => {
@@ -61,11 +62,33 @@ exports.postArticleComment = (req, res, next) => {
     return res.status(400).send({ msg: "Missing required fields" });
   }
   if (typeof username !== "string" || typeof body !== "string") {
-    return res.status(400).send({ msg: "Invalid data inputted" });
+    return res.status(400).send({ msg: "Invalid data type inputted" });
   }
   insertComment(article_id, username, body)
     .then((comment) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+exports.patchArticleVotes = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+  selectArticleById(article_id)
+    .then((article) => {
+      if (!article) {
+        return res
+          .status(404)
+          .send({ msg: `Unable to find Article by ID - ${article_id}` });
+      }
+      updateArticleVotes(article_id, inc_votes)
+        .then((article) => {
+          res.status(200).send({ article });
+        })
+        .catch((err) => {
+          next(err);
+        });
     })
     .catch((err) => {
       next(err);
