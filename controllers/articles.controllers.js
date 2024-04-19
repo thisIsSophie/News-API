@@ -34,6 +34,10 @@ exports.getArticleById = (req, res, next) => {
 };
 exports.getArticleComments = (req, res, next) => {
   const { article_id } = req.params;
+  if (!Number.isInteger(+article_id)) {
+    return res.status(400).send({ msg: "Article ID must be an integer" });
+  }
+
   selectArticleById(article_id).then((article) => {
     if (!article) {
       return res
@@ -64,9 +68,6 @@ exports.postArticleComment = (req, res, next) => {
       res.status(201).send({ comment });
     })
     .catch((err) => {
-      if (err.code === "23503") {
-        res.status(400).send({ msg: "Invalid Username: User does not exist" });
-      }
       next(err);
     });
 };
