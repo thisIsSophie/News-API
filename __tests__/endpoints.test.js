@@ -228,7 +228,7 @@ describe("/api/articles/:article_id/comments", () => {
       .expect(400)
       .expect({ msg: "Invalid data inputted" });
   });
-  test("POST 400: returns invalid username if user does not exist", () => {
+  test("POST 404: returns invalid username if user does not exist", () => {
     const newComment = {
       username: "peanutButter",
       body: "not as good as peanut butter",
@@ -236,11 +236,52 @@ describe("/api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send(newComment)
+      .expect(404)
+      .expect({ msg: "Resource not found" });
+  });
+
+  test("POST 201: Ignores unnecessary properties on request body", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "not as good as peanut butter",
+      favouriteFood: "PeanutButter",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment.author).toBe("butter_bridge");
+        expect(comment.body).toBe("not as good as peanut butter");
+        expect(comment).not.toHaveProperty("favouriteFood");
+      });
+  });
+
+  test("POST 404: Valid but non-existant article_id", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "not as good as peanut butter",
+    };
+    return request(app)
+      .post("/api/articles/9999/comments")
+      .send(newComment)
+      .expect(404)
+      .expect({ msg: "Resource not found" });
+  });
+
+  test("POST 400: Invalid article_id", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "not as good as peanut butter",
+    };
+    return request(app)
+      .post("/api/articles/notValid/comments")
+      .send(newComment)
       .expect(400)
       .expect({ msg: "Bad Request" });
   });
 });
-
 describe("/api/topics", () => {
   test("GET:200 sends an array of topic objects to the client", () => {
     return request(app)
