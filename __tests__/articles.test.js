@@ -114,4 +114,49 @@ describe("/api/articles/:article_id/comments", () => {
       .expect(200)
       .expect({ comments: [] });
   });
+  test("POST 201: adds a comment to an article & returns comment to the client", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: "what a lovely article",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then((response) => {
+        const { comment } = response.body;
+        expect(comment.author).toBe("butter_bridge");
+        expect(comment.body).toBe("what a lovely article");
+      });
+  });
+  test("POST 400: returns bad request when missing required fields", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({})
+      .expect(400)
+      .expect({ msg: "Missing required fields" });
+  });
+
+  test("POST 400: returns bad request for failing schema validation", () => {
+    const newComment = {
+      username: "butter_bridge",
+      body: 76,
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .expect({ msg: "Invalid data inputted" });
+  });
+  test("POST 400: returns invalid username if user does not exist", () => {
+    const newComment = {
+      username: "peanutButter",
+      body: "not as good as peanut butter",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .expect({ msg: "Invalid Username: User does not exist" });
+  });
 });

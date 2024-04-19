@@ -45,5 +45,23 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Takes a username & body for a comment to an article & returns comment",
+    "queries": [],
+    "exampleResponse": {
+      "article": [
+        {
+          "comment": {
+            "comment_id": 302,
+            "body": "testing",
+            "article_id": 1,
+            "author": "jessjelly",
+            "votes": 0,
+            "created_at": "2024-04-19T08:21:23.366Z"
+          }
+        }
+      ]
+    }
   }
 }
