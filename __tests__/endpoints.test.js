@@ -4,7 +4,7 @@ const request = require("supertest");
 const app = require("../app");
 const db = require("../db/connection");
 
-beforeAll(() => seed(testData));
+beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe("/api", () => {
@@ -71,6 +71,21 @@ describe("/api", () => {
       .then((response) => {
         expect(response.body).toMatchObject({
           "POST /api/articles/:article_id/comments": expect.objectContaining({
+            description: expect.any(String),
+            queries: [],
+            exampleResponse: expect.any(Object),
+          }),
+        });
+      });
+  });
+
+  test("PATCH: 200 sends an object of endpoint /api/articles/:article_id", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toMatchObject({
+          "PATCH /api/articles/:article_id/": expect.objectContaining({
             description: expect.any(String),
             queries: [],
             exampleResponse: expect.any(Object),
@@ -156,6 +171,62 @@ describe("/api/articles/:article_id", () => {
       .expect(400)
       .expect({ msg: "ID must be an integer" });
   });
+  test("PATCH 200: updates the votes property and returns the updated article", () => {
+    const updatedVotes = { inc_votes: 7 };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(updatedVotes)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article.votes).toBe(107);
+      });
+  });
+  test("PATCH 400: returns bad request when missing required fields", () => {
+    return request(app)
+      .patch("/api/articles/1/")
+      .send({})
+      .expect(400)
+      .expect({ msg: "Bad Request" });
+  });
+  test("PATCH 400: returns bad request when incorrect data type used", () => {
+    const updatedVotes = { inc_votes: "seven" };
+    return request(app)
+      .patch("/api/articles/1/")
+      .send(updatedVotes)
+      .expect(400)
+      .expect({ msg: "Bad Request" });
+  });
+  test("PATCH 200: Ignores unnecessary properties on request body", () => {
+    const updatedVotes = { inc_votes: 7, favourite_animal: "dog" };
+    return request(app)
+      .patch("/api/articles/1/")
+      .send(updatedVotes)
+      .expect(200)
+      .then((response) => {
+        const { article } = response.body;
+        expect(article.votes).toBe(107);
+        expect(article).not.toHaveProperty("favourite_animal");
+      });
+  });
+
+  test("PATCH 404: Valid but non-existant article_id", () => {
+    const updatedVotes = { inc_votes: 7 };
+    return request(app)
+      .patch("/api/articles/9999/")
+      .send(updatedVotes)
+      .expect(404)
+      .expect({ msg: "Unable to find Article by ID - 9999" });
+  });
+
+  test("PATCH 400: Invalid article_id", () => {
+    const updatedVotes = { inc_votes: 7 };
+    return request(app)
+      .patch("/api/articles/notValid/")
+      .send(updatedVotes)
+      .expect(400)
+      .expect({ msg: "Bad Request" });
+  });
 });
 
 describe("/api/articles/:article_id/comments", () => {
@@ -226,7 +297,7 @@ describe("/api/articles/:article_id/comments", () => {
       .post("/api/articles/1/comments")
       .send(newComment)
       .expect(400)
-      .expect({ msg: "Invalid data inputted" });
+      .expect({ msg: "Invalid data type inputted" });
   });
   test("POST 404: returns invalid username if user does not exist", () => {
     const newComment = {
