@@ -81,5 +81,9 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:article_id/": {
+    "description": "deletes the specified comment and sends no body back",
+    "queries": []
   }
 }

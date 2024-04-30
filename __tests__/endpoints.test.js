@@ -369,6 +369,23 @@ describe("/api/topics", () => {
   });
   //do not need to test again
 });
+describe("/api/comments/comment_id", () => {
+  test("DELETE:204 deletes the specified comment and sends no body back", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("DELETE:400 responds with Bad Request when given an invalid comment id", () => {
+    return request(app)
+      .delete("/api/comments/notAnId")
+      .expect(400)
+      .expect({ msg: "Bad Request" });
+  });
+  test("DELETE 404: Valid but non-existant comment_id", () => {
+    return request(app)
+      .delete("/api/comments/9999")
+      .expect(404)
+      .expect({ msg: "Unable to find Comment by ID - 9999" });
+  });
+});
 describe("All bad URL's", () => {
   test("GET: 404 responds with an error when route is non existant", () => {
     return request(app)
