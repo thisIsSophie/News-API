@@ -8,6 +8,7 @@ const {
   getArticleComments,
   postArticleComment,
   patchArticleVotes,
+  deleteArticleComment,
 } = require("./controllers/articles.controllers");
 
 app.use(express.json());
@@ -25,6 +26,8 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.post("/api/articles/:article_id/comments", postArticleComment);
+
+app.delete("/api/comments/:comment_id", deleteArticleComment);
 
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });

@@ -4,6 +4,7 @@ const {
   selectArticleComments,
   insertComment,
   updateArticleVotes,
+  removeArticleComment,
 } = require("../models/articles-models");
 
 exports.getArticles = (req, res, next) => {
@@ -85,6 +86,28 @@ exports.patchArticleVotes = (req, res, next) => {
       updateArticleVotes(article_id, inc_votes)
         .then((article) => {
           res.status(200).send({ article });
+        })
+        .catch((err) => {
+          next(err);
+        });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteArticleComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  selectArticleById(comment_id)
+    .then((comment) => {
+      if (!comment) {
+        return res
+          .status(404)
+          .send({ msg: `Unable to find Comment by ID - ${comment_id}` });
+      }
+      removeArticleComment(comment_id)
+        .then(() => {
+          res.status(204).send();
         })
         .catch((err) => {
           next(err);
