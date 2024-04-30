@@ -49,6 +49,7 @@ describe("/api", () => {
         });
       });
   });
+
   test("GET: 200 sends an object of endpoint /api/articles/:article_id", () => {
     return request(app)
       .get("/api")
@@ -133,6 +134,16 @@ describe("/api/articles", () => {
         expect(response.body.articles).toBeSortedBy("created_at", {
           descending: true,
         });
+      });
+  });
+
+  test("GET: 200 can filter articles by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then((response) => {
+        expect(response.body.articles).toHaveLength(1);
+        expect(response.body.articles[0].topic).toBe("cats");
       });
   });
 });
