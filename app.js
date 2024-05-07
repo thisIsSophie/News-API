@@ -32,6 +32,10 @@ app.delete("/api/comments/:comment_id", deleteArticleComment);
 
 app.get("/api/users", getUsers);
 
+const cors = require("cors");
+
+app.use(cors());
+
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });
 });
