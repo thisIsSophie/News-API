@@ -1,3 +1,4 @@
+const cors = require("cors");
 const express = require("express");
 const app = express();
 const { getTopics } = require("./controllers/topics-controllers");
@@ -11,6 +12,8 @@ const {
   patchArticleVotes,
   deleteArticleComment,
 } = require("./controllers/articles.controllers");
+
+app.use(cors());
 
 app.use(express.json());
 
@@ -31,10 +34,6 @@ app.post("/api/articles/:article_id/comments", postArticleComment);
 app.delete("/api/comments/:comment_id", deleteArticleComment);
 
 app.get("/api/users", getUsers);
-
-const cors = require("cors");
-
-app.use(cors());
 
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });
