@@ -5,6 +5,7 @@ const {
   insertComment,
   updateArticleVotes,
   removeArticleComment,
+  selectCommentById,
 } = require("../models/articles-models");
 
 exports.getArticles = (req, res, next) => {
@@ -99,7 +100,7 @@ exports.patchArticleVotes = (req, res, next) => {
 
 exports.deleteArticleComment = (req, res, next) => {
   const { comment_id } = req.params;
-  selectArticleById(comment_id)
+  selectCommentById(comment_id)
     .then((comment) => {
       if (!comment) {
         return res
